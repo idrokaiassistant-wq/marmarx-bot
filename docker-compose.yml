@@ -1,0 +1,75 @@
+services:
+  db:
+    image: postgres:15
+    container_name: marmarx_db
+    environment:
+      POSTGRES_USER: marmarx
+      POSTGRES_PASSWORD: marmarx_password
+      POSTGRES_DB: marmarx_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"  # External port 5434, internal port 5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U marmarx"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - marmarx_net
+
+  api:
+    build: .
+    container_name: marmarx_api
+    command: uvicorn app.api.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/app
+    ports:
+      - "8002:8000"  # External port 8002, internal port 8000
+    environment:
+      - DB_URL=postgresql+asyncpg://marmarx:marmarx_password@db:5432/marmarx_db
+      - BOT_TOKEN=${BOT_TOKEN}
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - marmarx_net
+
+  frontend:
+    image: nginx:alpine
+    container_name: marmarx_frontend
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8080:80"  # Biz brauzerda localhost:8080 orqali kiramiz
+    depends_on:
+      - api
+    networks:
+      - marmarx_net
+
+  bot:
+    build: .
+    container_name: marmarx_bot
+    command: python -m app.bot.main
+    volumes:
+      - .:/app
+    environment:
+      - DB_URL=postgresql+asyncpg://marmarx:marmarx_password@db:5432/marmarx_db
+      - BOT_TOKEN=${BOT_TOKEN}
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - marmarx_net
+
+volumes:
+  postgres_data:
+
+networks:
+  marmarx_net:
+    driver: bridge

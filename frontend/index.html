@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>MarmarX - Marmar Do'koni</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-3">
+            <h1 class="text-2xl font-bold text-gray-800 text-center">MarmarX</h1>
+        </div>
+    </header>
+
+    <!-- Categories Tabs -->
+    <div class="bg-white border-b border-gray-200 sticky top-[60px] z-30">
+        <div class="container mx-auto px-4 py-3">
+            <div id="categories" class="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+                <!-- Categories will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading" class="container mx-auto px-4 py-8 text-center">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <p class="mt-2 text-gray-600">Yuklanmoqda...</p>
+    </div>
+
+    <!-- Products Grid -->
+    <main class="container mx-auto px-4 py-6">
+        <div id="products" class="grid grid-cols-2 gap-4">
+            <!-- Products will be rendered here -->
+        </div>
+        <div id="no-products" class="hidden text-center py-12">
+            <p class="text-gray-500">Mahsulotlar topilmadi.</p>
+        </div>
+    </main>
+
+    <!-- Floating Cart Button -->
+    <button 
+        id="cart-btn"
+        class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-lg z-50 transition-all hover:scale-105"
+        aria-label="Savatcha"
+    >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+        </svg>
+        <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+    </button>
+
+    <!-- Slab Modal -->
+    <div id="slab-modal" class="modal hidden">
+        <div class="modal-overlay" onclick="closeSlabModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="slab-product-name" class="text-xl font-bold text-gray-800"></h2>
+                <button onclick="closeSlabModal()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="slab-product-description" class="text-gray-600 mb-4"></p>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Kenglik (sm)
+                        </label>
+                        <input 
+                            type="number" 
+                            id="slab-width" 
+                            min="0" 
+                            step="0.1"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Kenglikni kiriting"
+                        />
+                        <p id="slab-width-range" class="text-xs text-gray-500 mt-1"></p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Uzunlik (m)
+                        </label>
+                        <input 
+                            type="number" 
+                            id="slab-length" 
+                            min="0" 
+                            step="0.1"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Uzunlikni kiriting"
+                        />
+                        <p id="slab-length-range" class="text-xs text-gray-500 mt-1"></p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700">Narx:</span>
+                            <span id="slab-calculated-price" class="text-lg font-bold text-blue-600">0 so'm</span>
+                        </div>
+                        <p id="slab-calculation-info" class="text-xs text-gray-500"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button 
+                    onclick="addSlabToCart()" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors"
+                >
+                    Savatga qo'shish
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="modal hidden">
+        <div class="modal-overlay" onclick="closeCartModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-xl font-bold text-gray-800">Savatcha</h2>
+                <button onclick="closeCartModal()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="cart-items" class="space-y-3">
+                    <!-- Cart items will be rendered here -->
+                </div>
+                <div id="cart-empty" class="hidden text-center py-8">
+                    <p class="text-gray-500">Savatcha bo'sh</p>
+                </div>
+                <div id="cart-summary" class="mt-6 pt-4 border-t border-gray-200 hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-lg font-semibold text-gray-800">Jami:</span>
+                        <span id="cart-total" class="text-xl font-bold text-blue-600">0 so'm</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button 
+                    onclick="checkout()" 
+                    id="checkout-btn"
+                    class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium transition-colors hidden"
+                >
+                    Buyurtma berish
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
