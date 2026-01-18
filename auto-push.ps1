@@ -10,7 +10,17 @@ Write-Host "`nBarcha o'zgarishlarni qo'shyapman..." -ForegroundColor Yellow
 git add .
 
 # Commit xabarini so'rash
-$commitMessage = Read-Host "Commit xabarini kiriting"
+Write-Host "`nCommit xabarini kiriting (faqat matn, git komandalar emas):" -ForegroundColor Cyan
+$commitMessage = Read-Host ""
+
+if ([string]::IsNullOrWhiteSpace($commitMessage)) {
+    $commitMessage = "Update: " + (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+}
+
+# Git komandalarni olib tashlash agar kiritsa
+$commitMessage = $commitMessage -replace 'git\s+(add|commit|push|status).*', ''
+$commitMessage = $commitMessage -replace '&&.*', ''
+$commitMessage = $commitMessage.Trim()
 
 if ([string]::IsNullOrWhiteSpace($commitMessage)) {
     $commitMessage = "Update: " + (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
@@ -18,10 +28,24 @@ if ([string]::IsNullOrWhiteSpace($commitMessage)) {
 
 # Commit yaratish
 Write-Host "`nCommit yaratilmoqda..." -ForegroundColor Yellow
-git commit -m $commitMessage
+$commitResult = git commit -m "$commitMessage" 2>&1
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "❌ Xato: Commit qilinmadi!" -ForegroundColor Red
+    Write-Host $commitResult -ForegroundColor Red
+    Write-Host "`nIltimos, qaytadan urinib ko'ring." -ForegroundColor Yellow
+    exit 1
+}
 
 # Push qilish
 Write-Host "`nPush qilinmoqda..." -ForegroundColor Yellow
-git push origin main
+$pushResult = git push origin main 2>&1
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "❌ Xato: Push qilinmadi!" -ForegroundColor Red
+    Write-Host $pushResult -ForegroundColor Red
+    Write-Host "`nIltimos, qaytadan urinib ko'ring." -ForegroundColor Yellow
+    exit 1
+}
 
 Write-Host "`n✅ Bajarildi!" -ForegroundColor Green
