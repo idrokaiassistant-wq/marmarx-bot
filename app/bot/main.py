@@ -54,19 +54,133 @@ class SearchStates(StatesGroup):
     waiting_for_query = State()
 
 
+# Admin FSM States
+class AdminProductStates(StatesGroup):
+    waiting_for_category_id = State()
+    waiting_for_name = State()
+    waiting_for_description = State()
+    waiting_for_price = State()
+    waiting_for_price_type = State()
+
+
+class AdminCategoryStates(StatesGroup):
+    waiting_for_name = State()
+    waiting_for_slug = State()
+
+
 # Helper functions
-def get_main_keyboard() -> ReplyKeyboardMarkup:
+def is_admin(user_id: int) -> bool:
+    """Check if user is admin."""
+    if not settings.ADMIN_USER_IDS:
+        return False
+    admin_ids = [int(uid.strip()) for uid in settings.ADMIN_USER_IDS.split(",") if uid.strip()]
+    return user_id in admin_ids
+
+
+def get_main_keyboard(user_id: Optional[int] = None) -> ReplyKeyboardMarkup:
     """Create main menu keyboard."""
+    buttons = [
+        [KeyboardButton(text=messages.BTN_CATALOG)],
+        [KeyboardButton(text=messages.BTN_SEARCH)],
+        [KeyboardButton(text=messages.BTN_MY_ORDERS)],
+    ]
+    
+    # Add admin button if user is admin
+    if user_id and is_admin(user_id):
+        buttons.append([KeyboardButton(text=messages.BTN_ADMIN_MENU)])
+    
     keyboard = ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text=messages.BTN_CATALOG)],
-            [KeyboardButton(text=messages.BTN_SEARCH)],
-            [KeyboardButton(text=messages.BTN_MY_ORDERS)],
-        ],
+        keyboard=buttons,
         resize_keyboard=True,
         one_time_keyboard=False
     )
     return keyboard
+
+
+def get_admin_menu_keyboard() -> InlineKeyboardMarkup:
+    """Create admin menu inline keyboard."""
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=messages.BTN_ADMIN_PRODUCTS,
+                    callback_data="admin_products"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text=messages.BTN_ADMIN_CATEGORIES,
+                    callback_data="admin_categories"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text=messages.BTN_ADMIN_ORDERS,
+                    callback_data="admin_orders"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text=messages.BTN_MAIN_MENU,
+                    callback_data="main_menu"
+                )
+            ]
+        ]
+    )
+
+
+def get_admin_products_keyboard() -> InlineKeyboardMarkup:
+    """Create admin products management keyboard."""
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=messages.BTN_ADMIN_ADD_PRODUCT,
+                    callback_data="admin_add_product"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text=messages.BTN_ADMIN_LIST_PRODUCTS,
+                    callback_data="admin_list_products"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text=messages.BTN_BACK,
+                    callback_data="admin_menu"
+                ),
+                InlineKeyboardButton(
+                    text=messages.BTN_MAIN_MENU,
+                    callback_data="main_menu"
+                )
+            ]
+        ]
+    )
+
+
+def get_admin_categories_keyboard() -> InlineKeyboardMarkup:
+    """Create admin categories management keyboard."""
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=messages.BTN_ADMIN_ADD_CATEGORY,
+                    callback_data="admin_add_category"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text=messages.BTN_BACK,
+                    callback_data="admin_menu"
+                ),
+                InlineKeyboardButton(
+                    text=messages.BTN_MAIN_MENU,
+                    callback_data="main_menu"
+                )
+            ]
+        ]
+    )
 
 
 async def get_categories_keyboard() -> InlineKeyboardMarkup:
@@ -168,7 +282,7 @@ async def cmd_start(message: Message):
     """Handle /start command."""
     await message.answer(
         f"{messages.WELCOME_MSG}\n\n{messages.MAIN_MENU}",
-        reply_markup=get_main_keyboard(),
+        reply_markup=get_main_keyboard(message.from_user.id),
         parse_mode=ParseMode.MARKDOWN
     )
 
@@ -267,7 +381,22 @@ async def handle_main_menu(message: Message, state: FSMContext):
     await state.clear()
     await message.answer(
         messages.MAIN_MENU,
-        reply_markup=get_main_keyboard(),
+        reply_markup=get_main_keyboard(message.from_user.id),
+        parse_mode=ParseMode.MARKDOWN
+    )
+
+
+@dp.message(F.text == messages.BTN_ADMIN_MENU)
+@dp.message(Command("admin"))
+async def handle_admin_menu(message: Message):
+    """Handle admin menu."""
+    if not is_admin(message.from_user.id):
+        await message.answer(messages.ADMIN_ACCESS_DENIED)
+        return
+    
+    await message.answer(
+        messages.ADMIN_MENU,
+        reply_markup=get_admin_menu_keyboard(),
         parse_mode=ParseMode.MARKDOWN
     )
 
@@ -780,13 +909,271 @@ def _format_webapp_response(data: dict) -> str:
     return "\n".join(lines) if lines else "Ma'lumotlar qayta ishlanmoqda..."
 
 
+# Admin callback handlers
+@dp.callback_query(F.data == "admin_menu")
+async def callback_admin_menu(callback: CallbackQuery):
+    """Handle admin menu callback."""
+    if not is_admin(callback.from_user.id):
+        await callback.answer(messages.ADMIN_ACCESS_DENIED)
+        return
+    
+    await callback.message.edit_text(
+        messages.ADMIN_MENU,
+        reply_markup=get_admin_menu_keyboard(),
+        parse_mode=ParseMode.MARKDOWN
+    )
+    await callback.answer()
+
+
+@dp.callback_query(F.data == "admin_products")
+async def callback_admin_products(callback: CallbackQuery):
+    """Handle admin products menu."""
+    if not is_admin(callback.from_user.id):
+        await callback.answer(messages.ADMIN_ACCESS_DENIED)
+        return
+    
+    await callback.message.edit_text(
+        messages.ADMIN_PRODUCTS,
+        reply_markup=get_admin_products_keyboard(),
+        parse_mode=ParseMode.MARKDOWN
+    )
+    await callback.answer()
+
+
+@dp.callback_query(F.data == "admin_categories")
+async def callback_admin_categories(callback: CallbackQuery):
+    """Handle admin categories menu."""
+    if not is_admin(callback.from_user.id):
+        await callback.answer(messages.ADMIN_ACCESS_DENIED)
+        return
+    
+    await callback.message.edit_text(
+        messages.ADMIN_CATEGORIES,
+        reply_markup=get_admin_categories_keyboard(),
+        parse_mode=ParseMode.MARKDOWN
+    )
+    await callback.answer()
+
+
+@dp.callback_query(F.data == "admin_add_product")
+async def callback_admin_add_product(callback: CallbackQuery, state: FSMContext):
+    """Handle admin add product request."""
+    if not is_admin(callback.from_user.id):
+        await callback.answer(messages.ADMIN_ACCESS_DENIED)
+        return
+    
+    await callback.message.answer(messages.ADMIN_ENTER_CATEGORY_ID)
+    await state.set_state(AdminProductStates.waiting_for_category_id)
+    await callback.answer()
+
+
+@dp.callback_query(F.data == "admin_add_category")
+async def callback_admin_add_category(callback: CallbackQuery, state: FSMContext):
+    """Handle admin add category request."""
+    if not is_admin(callback.from_user.id):
+        await callback.answer(messages.ADMIN_ACCESS_DENIED)
+        return
+    
+    await callback.message.answer(messages.ADMIN_ENTER_CATEGORY_NAME)
+    await state.set_state(AdminCategoryStates.waiting_for_name)
+    await callback.answer()
+
+
+# Admin FSM handlers - Product creation
+@dp.message(StateFilter(AdminProductStates.waiting_for_category_id))
+async def handle_admin_product_category_id(message: Message, state: FSMContext):
+    """Handle category ID input for product creation."""
+    if not is_admin(message.from_user.id):
+        await message.answer(messages.ADMIN_ACCESS_DENIED)
+        await state.clear()
+        return
+    
+    try:
+        category_id = int(message.text)
+    except ValueError:
+        await message.answer(messages.INVALID_INPUT + "\nKategoriya ID raqam bo'lishi kerak.")
+        return
+    
+    # Verify category exists
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(Category).where(Category.id == category_id)
+        )
+        category = result.scalar_one_or_none()
+        
+        if not category:
+            await message.answer(messages.CATEGORY_NOT_FOUND)
+            return
+    
+    await state.update_data(category_id=category_id)
+    await message.answer(messages.ADMIN_ENTER_PRODUCT_NAME)
+    await state.set_state(AdminProductStates.waiting_for_name)
+
+
+@dp.message(StateFilter(AdminProductStates.waiting_for_name))
+async def handle_admin_product_name(message: Message, state: FSMContext):
+    """Handle product name input."""
+    if not is_admin(message.from_user.id):
+        await message.answer(messages.ADMIN_ACCESS_DENIED)
+        await state.clear()
+        return
+    
+    product_name = message.text.strip()
+    if not product_name:
+        await message.answer("Mahsulot nomi bo'sh bo'lishi mumkin emas.")
+        return
+    
+    await state.update_data(name=product_name)
+    await message.answer(messages.ADMIN_ENTER_PRODUCT_DESCRIPTION)
+    await state.set_state(AdminProductStates.waiting_for_description)
+
+
+@dp.message(StateFilter(AdminProductStates.waiting_for_description))
+async def handle_admin_product_description(message: Message, state: FSMContext):
+    """Handle product description input."""
+    if not is_admin(message.from_user.id):
+        await message.answer(messages.ADMIN_ACCESS_DENIED)
+        await state.clear()
+        return
+    
+    description = message.text.strip() if message.text.strip().lower() != "skip" else None
+    await state.update_data(description=description)
+    await message.answer(messages.ADMIN_ENTER_PRODUCT_PRICE)
+    await state.set_state(AdminProductStates.waiting_for_price)
+
+
+@dp.message(StateFilter(AdminProductStates.waiting_for_price))
+async def handle_admin_product_price(message: Message, state: FSMContext):
+    """Handle product price input."""
+    if not is_admin(message.from_user.id):
+        await message.answer(messages.ADMIN_ACCESS_DENIED)
+        await state.clear()
+        return
+    
+    try:
+        price = float(message.text.replace(",", "."))
+        if price <= 0:
+            raise ValueError()
+    except ValueError:
+        await message.answer(messages.INVALID_NUMBER)
+        return
+    
+    await state.update_data(price=price)
+    
+    # Create price type selection keyboard
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="Dona", callback_data="admin_price_type_dona"),
+                InlineKeyboardButton(text="Kv. metr", callback_data="admin_price_type_kv_metr")
+            ]
+        ]
+    )
+    
+    await message.answer(messages.ADMIN_ENTER_PRICE_TYPE, reply_markup=keyboard)
+    await state.set_state(AdminProductStates.waiting_for_price_type)
+
+
+@dp.callback_query(F.data.startswith("admin_price_type_"), StateFilter(AdminProductStates.waiting_for_price_type))
+async def handle_admin_product_price_type(callback: CallbackQuery, state: FSMContext):
+    """Handle price type selection."""
+    if not is_admin(callback.from_user.id):
+        await callback.answer(messages.ADMIN_ACCESS_DENIED)
+        await state.clear()
+        return
+    
+    price_type_str = callback.data.split("_")[-1]
+    price_type = PriceType.DONA if price_type_str == "dona" else PriceType.KV_METR
+    
+    data = await state.get_data()
+    
+    # Create product
+    async with AsyncSessionLocal() as session:
+        product = Product(
+            category_id=data["category_id"],
+            name=data["name"],
+            description=data.get("description"),
+            price=Decimal(str(data["price"])),
+            price_type=price_type
+        )
+        session.add(product)
+        await session.commit()
+        await session.refresh(product)
+    
+    await callback.message.answer(
+        messages.ADMIN_PRODUCT_ADDED.format(
+            name=product.name,
+            price=product.price
+        ),
+        parse_mode=ParseMode.MARKDOWN,
+        reply_markup=get_admin_products_keyboard()
+    )
+    await state.clear()
+    await callback.answer("✅ Mahsulot qo'shildi!")
+
+
+# Admin FSM handlers - Category creation
+@dp.message(StateFilter(AdminCategoryStates.waiting_for_name))
+async def handle_admin_category_name(message: Message, state: FSMContext):
+    """Handle category name input."""
+    if not is_admin(message.from_user.id):
+        await message.answer(messages.ADMIN_ACCESS_DENIED)
+        await state.clear()
+        return
+    
+    category_name = message.text.strip()
+    if not category_name:
+        await message.answer("Kategoriya nomi bo'sh bo'lishi mumkin emas.")
+        return
+    
+    await state.update_data(name=category_name)
+    await message.answer(messages.ADMIN_ENTER_CATEGORY_SLUG)
+    await state.set_state(AdminCategoryStates.waiting_for_slug)
+
+
+@dp.message(StateFilter(AdminCategoryStates.waiting_for_slug))
+async def handle_admin_category_slug(message: Message, state: FSMContext):
+    """Handle category slug input."""
+    if not is_admin(message.from_user.id):
+        await message.answer(messages.ADMIN_ACCESS_DENIED)
+        await state.clear()
+        return
+    
+    slug = message.text.strip().lower().replace(" ", "-")
+    if not slug:
+        await message.answer("Slug bo'sh bo'lishi mumkin emas.")
+        return
+    
+    data = await state.get_data()
+    
+    # Create category
+    async with AsyncSessionLocal() as session:
+        category = Category(
+            name=data["name"],
+            slug=slug
+        )
+        session.add(category)
+        await session.commit()
+        await session.refresh(category)
+    
+    await message.answer(
+        messages.ADMIN_CATEGORY_ADDED.format(
+            name=category.name,
+            slug=category.slug
+        ),
+        parse_mode=ParseMode.MARKDOWN,
+        reply_markup=get_admin_categories_keyboard()
+    )
+    await state.clear()
+
+
 # Unknown message handler
 @dp.message()
 async def handle_unknown(message: Message):
     """Handle unknown messages."""
     await message.answer(
         messages.UNKNOWN_COMMAND,
-        reply_markup=get_main_keyboard()
+        reply_markup=get_main_keyboard(message.from_user.id)
     )
 
 

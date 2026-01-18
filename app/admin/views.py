@@ -1,5 +1,5 @@
 from sqladmin import ModelView
-from app.models.product import Category, Product, Service
+from app.models.product import Category, Product, Service, Order, OrderStatus
 from app.core.messages import messages
 
 
@@ -93,3 +93,51 @@ class ServiceAdmin(ModelView, model=Service):
     column_filters = [Service.context_type]
     
     form_columns = [Service.name, Service.price, Service.context_type]
+
+
+class OrderAdmin(ModelView, model=Order):
+    """Admin view for Order model with Uzbek labels."""
+    
+    name = "Buyurtma"
+    name_plural = "Buyurtmalar"
+    icon = "fa-solid fa-shopping-cart"
+    
+    column_list = [
+        Order.id,
+        Order.user_id,
+        Order.product_id,
+        Order.quantity,
+        Order.area,
+        Order.total_price,
+        Order.status,
+        Order.created_at
+    ]
+    
+    column_labels = {
+        Order.id: "ID",
+        Order.user_id: "Foydalanuvchi ID",
+        Order.product_id: "Mahsulot ID",
+        Order.quantity: "Soni (dona)",
+        Order.area: "Maydon (kv.metr)",
+        Order.total_price: "Jami narx",
+        Order.status: "Holat",
+        Order.created_at: "Yaratilgan sana"
+    }
+    
+    column_searchable_list = [Order.user_id, Order.product_id]
+    column_sortable_list = [Order.id, Order.created_at, Order.total_price]
+    column_filters = [Order.status, Order.product_id]
+    
+    form_columns = [
+        Order.user_id,
+        Order.product_id,
+        Order.quantity,
+        Order.area,
+        Order.total_price,
+        Order.status
+    ]
+    
+    # Can create new orders from admin
+    can_create = True
+    can_edit = True
+    can_delete = True

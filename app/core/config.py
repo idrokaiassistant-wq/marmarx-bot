@@ -11,9 +11,12 @@ class Settings(BaseSettings):
     # Telegram Bot
     BOT_TOKEN: str
     
-    # Admin Panel
+    # Admin Panel (Web)
     ADMIN_USERNAME: str = "admin"
     ADMIN_PASSWORD: str = "admin123"
+    
+    # Telegram Bot Admin (comma-separated user IDs)
+    ADMIN_USER_IDS: str = ""
     
     # API Settings
     API_HOST: str = "0.0.0.0"

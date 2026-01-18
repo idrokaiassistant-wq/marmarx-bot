@@ -109,6 +109,52 @@ class Messages:
     MAIN_MENU = "🏠 **Asosiy menyu**\n\n" \
                 "Kerakli bo'limni tanlang:"
     GO_BACK = "Orqaga qaytildi."
+    
+    # Admin messages
+    ADMIN_ACCESS_DENIED = "❌ Sizda admin huquqi yo'q."
+    ADMIN_MENU = "🔧 **Admin Panel**\n\n" \
+                 "Kerakli bo'limni tanlang:"
+    ADMIN_PRODUCTS = "📦 Mahsulotlar boshqaruvi"
+    ADMIN_CATEGORIES = "📂 Kategoriyalar boshqaruvi"
+    ADMIN_ORDERS = "📋 Buyurtmalar boshqaruvi"
+    ADMIN_SERVICES = "🔧 Xizmatlar boshqaruvi"
+    
+    # Admin - Product management
+    ADMIN_ADD_PRODUCT = "Yangi mahsulot qo'shish"
+    ADMIN_LIST_PRODUCTS = "Mahsulotlar ro'yxati"
+    ADMIN_EDIT_PRODUCT = "Mahsulotni tahrirlash"
+    ADMIN_DELETE_PRODUCT = "Mahsulotni o'chirish"
+    
+    # Admin - Category management
+    ADMIN_ADD_CATEGORY = "Yangi kategoriya qo'shish"
+    ADMIN_LIST_CATEGORIES = "Kategoriyalar ro'yxati"
+    
+    # Admin - Order management
+    ADMIN_LIST_ORDERS = "Barcha buyurtmalar"
+    ADMIN_UPDATE_ORDER_STATUS = "Buyurtma holatini o'zgartirish"
+    
+    # Admin - Product creation flow
+    ADMIN_ENTER_CATEGORY_ID = "Kategoriya ID'ni kiriting:"
+    ADMIN_ENTER_PRODUCT_NAME = "Mahsulot nomini kiriting:"
+    ADMIN_ENTER_PRODUCT_DESCRIPTION = "Mahsulot tavsifini kiriting (ixtiyoriy, 'skip' yozish orqali o'tkazib yuborish mumkin):"
+    ADMIN_ENTER_PRODUCT_PRICE = "Mahsulot narxini kiriting (so'm):"
+    ADMIN_ENTER_PRICE_TYPE = "Narx turini tanlang:"
+    ADMIN_PRODUCT_ADDED = "✅ Mahsulot muvaffaqiyatli qo'shildi!\n\n📦 {name}\n💰 Narx: {price:,.0f} so'm"
+    
+    # Admin - Category creation flow
+    ADMIN_ENTER_CATEGORY_NAME = "Kategoriya nomini kiriting:"
+    ADMIN_ENTER_CATEGORY_SLUG = "Kategoriya slug'ini kiriting (lotin harflar, tire bilan, masalan: maxsus-slablar):"
+    ADMIN_CATEGORY_ADDED = "✅ Kategoriya muvaffaqiyatli qo'shildi!\n\n📂 {name}\n🔗 Slug: {slug}"
+    
+    # Admin buttons
+    BTN_ADMIN_MENU = "🔧 Admin Panel"
+    BTN_ADMIN_PRODUCTS = "📦 Mahsulotlar"
+    BTN_ADMIN_CATEGORIES = "📂 Kategoriyalar"
+    BTN_ADMIN_ORDERS = "📋 Buyurtmalar"
+    BTN_ADMIN_SERVICES = "🔧 Xizmatlar"
+    BTN_ADMIN_ADD_PRODUCT = "+ Mahsulot qo'shish"
+    BTN_ADMIN_LIST_PRODUCTS = "📋 Mahsulotlar ro'yxati"
+    BTN_ADMIN_ADD_CATEGORY = "+ Kategoriya qo'shish"
 
 
 # Create a singleton instance

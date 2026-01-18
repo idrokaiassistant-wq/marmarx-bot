@@ -12,7 +12,7 @@ from app.models.product import Product, PriceType
 from app.core.messages import messages
 from app.core.config import settings
 from sqladmin import Admin
-from app.admin.views import CategoryAdmin, ProductAdmin, ServiceAdmin
+from app.admin.views import CategoryAdmin, ProductAdmin, ServiceAdmin, OrderAdmin
 
 # Create FastAPI app
 app = FastAPI(
@@ -69,6 +69,7 @@ admin = Admin(
 admin.add_view(CategoryAdmin)
 admin.add_view(ProductAdmin)
 admin.add_view(ServiceAdmin)
+admin.add_view(OrderAdmin)
 
 
 # Pydantic models for API

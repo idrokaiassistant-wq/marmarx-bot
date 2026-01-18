@@ -45,8 +45,12 @@ Dokploy dashboard'da quyidagi servislar ishlayapti:
 Production environment'da quyidagi environment variables sozlangan:
 
 ```env
+# marmarx-bot servisi uchun:
 DB_URL=postgresql+asyncpg://marmarx:marmarx_password@marmarx-db:5432/marmarx_db
 BOT_TOKEN=<production_bot_token>
+ADMIN_USER_IDS=<telegram_user_id1>,<telegram_user_id2>  # Vergul bilan ajratilgan
+
+# marmarx-api servisi uchun (web admin panel):
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=<production_admin_password>
 ```
