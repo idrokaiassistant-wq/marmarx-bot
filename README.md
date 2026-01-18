@@ -9,7 +9,8 @@ MarmarX - marmar mahsulotlarini sotish uchun to'liq funksional tizim.
 - **PostgreSQL** - Ma'lumotlar bazasi
 - **SQLAlchemy (Async)** - ORM
 - **SQLAdmin** - Admin panel
-- **Docker** - Konteynerlashtirish
+- **Docker** - Konteynerlashtirish (Development uchun)
+- **Dokploy** - Production deployment platformasi
 
 ## Loyiha Strukturasi
 
@@ -34,9 +35,25 @@ MarmarX/
 └── .env
 ```
 
-## O'rnatish va Ishga Tushirish
+## Deployment (Ishga Tushirish)
 
-### 1. Sozlamalar
+> **⚠️ Muhim:** Dastur productionda **Dokploy serverida** ishlayapti. Docker faqat lokal development uchun ishlatiladi.
+
+### Production (Dokploy Server)
+
+Dastur Dokploy platformasida production environment'da ishlayapti. Batafsil ma'lumot uchun [DEPLOYMENT.md](DEPLOYMENT.md) faylini ko'ring.
+
+**Production servislar:**
+- `marmarx-api` - FastAPI backend
+- `marmarx-bot` - Telegram bot
+- `marmarx-db` - PostgreSQL ma'lumotlar bazasi
+- `marmarx-frontend` - Frontend (nginx)
+
+### Development (Lokal)
+
+Lokal rivojlantirish uchun Docker Compose ishlatiladi.
+
+#### 1. Sozlamalar
 
 `.env` faylini yarating va quyidagilarni to'ldiring:
 
@@ -47,7 +64,7 @@ ADMIN_USERNAME=admin
 ADMIN_PASSWORD=admin123
 ```
 
-### 2. Docker orqali ishga tushirish
+#### 2. Docker orqali ishga tushirish
 
 ```bash
 # Barcha servislarni ishga tushirish
@@ -60,7 +77,7 @@ docker-compose logs -f
 docker-compose down
 ```
 
-### 3. Lokal ishga tushirish
+#### 3. Lokal ishga tushirish (Docker Compose'siz)
 
 ```bash
 # Virtual environment yaratish
@@ -119,7 +136,11 @@ Barcha mahsulotlarni olish
 
 ## Admin Panel
 
-Admin panelga kirish: `http://localhost:8000/admin`
+### Production
+Admin panelga kirish: Dokploy dashboard orqali API URL'dan `/admin` endpointiga kirish
+
+### Development (Lokal)
+Admin panelga kirish: `http://localhost:8002/admin`
 
 Default foydalanuvchi:
 - Username: `admin`
@@ -175,15 +196,33 @@ NEW_MESSAGE = "Yangi xabar"
 
 Alembic ishlatiladi (kelajakda qo'shiladi).
 
+## Deployment Hujjatlari
+
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Dokploy production deployment qo'llanmasi
+- **[QUICKSTART.md](QUICKSTART.md)** - Tezkor boshlash qo'llanmasi (Development)
+
 ## Muammolarni Hal Qilish
 
 ### Bot ishlamayapti
 - `.env` faylida `BOT_TOKEN` to'g'ri ekanligini tekshiring
 - Bot token @BotFather dan olingan bo'lishi kerak
+- Productionda: Dokploy dashboard'dan bot servisining loglarini tekshiring
 
 ### Ma'lumotlar bazasi ulanmayapti
 - PostgreSQL ishga tushganligini tekshiring
 - `DB_URL` to'g'ri ekanligini tekshiring
+- Productionda: Dokploy dashboard'dan db servisining holatini tekshiring
+
+## Git Workflow
+
+Kod o'zgarishlaridan keyin avtomatik push qilish uchun [GIT_WORKFLOW.md](GIT_WORKFLOW.md) qo'llanmasini ko'ring.
+
+**Tezkor komanda:**
+```bash
+git add . && git commit -m "feat: Tavsif" && git push origin main
+```
+
+Yoki Windows PowerShell'da `auto-push.ps1` skriptini ishlating.
 
 ## Litsenziya
 

@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, Numeric, ForeignKey, Enum as SQLEnum
+from sqlalchemy import Column, Integer, String, Numeric, ForeignKey, Enum as SQLEnum, DateTime, BigInteger
 from sqlalchemy.orm import relationship
 from enum import Enum as PyEnum
+from datetime import datetime
 from app.db import Base
 
 
@@ -15,6 +16,14 @@ class ServiceContextType(PyEnum):
     HOVLI = "hovli"  # Yard
     OFIS = "ofis"  # Office
     DOM = "dom"  # House
+
+
+class OrderStatus(PyEnum):
+    """Order status enumeration."""
+    PENDING = "pending"  # Qabul qilindi
+    PROCESSING = "processing"  # Ko'rib chiqilmoqda
+    COMPLETED = "completed"  # Bajarildi
+    CANCELLED = "cancelled"  # Bekor qilindi
 
 
 class Category(Base):
@@ -92,3 +101,23 @@ class Service(Base):
     
     def __repr__(self):
         return f"<Service(id={self.id}, name='{self.name}', price={self.price}, context_type='{self.context_type.value}')>"
+
+
+class Order(Base):
+    """Order model for user orders."""
+    __tablename__ = "orders"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(BigInteger, nullable=False, index=True)  # Telegram user ID
+    product_id = Column(Integer, ForeignKey("products.id"), nullable=False, index=True)
+    quantity = Column(Numeric(10, 2), nullable=True)  # For 'dona' type
+    area = Column(Numeric(10, 2), nullable=True)  # For 'kv_metr' type (in m²)
+    total_price = Column(Numeric(12, 2), nullable=False)
+    status = Column(SQLEnum(OrderStatus), nullable=False, default=OrderStatus.PENDING)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
+    
+    # Relationship
+    product = relationship("Product")
+    
+    def __repr__(self):
+        return f"<Order(id={self.id}, user_id={self.user_id}, product_id={self.product_id}, total_price={self.total_price}, status='{self.status.value}')>"

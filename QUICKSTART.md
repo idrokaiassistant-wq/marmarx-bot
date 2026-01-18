@@ -1,6 +1,16 @@
 # MarmarX - Tezkor Boshlash Qo'llanmasi
 
-## 1. Sozlamalar
+> **⚠️ Muhim:** Bu qo'llanma **lokal development** uchun. Production deployment uchun [DEPLOYMENT.md](DEPLOYMENT.md) faylini ko'ring.
+
+## Production (Dokploy Server)
+
+Dastur Dokploy serverida production holatida ishlayapti. Production deployment haqida to'liq ma'lumot: [DEPLOYMENT.md](DEPLOYMENT.md)
+
+---
+
+## Development (Lokal)
+
+### 1. Sozlamalar
 
 `.env` faylini yarating (`.env.example` dan nusxa oling):
 
@@ -11,7 +21,7 @@ cp .env.example .env
 `.env` faylini tahrirlang va `BOT_TOKEN` ni to'ldiring:
 - Telegram Bot token olish: [@BotFather](https://t.me/BotFather) ga murojaat qiling
 
-## 2. Docker orqali ishga tushirish (Tavsiya etiladi)
+### 2. Docker orqali ishga tushirish (Tavsiya etiladi)
 
 ```bash
 # Barcha servislarni ishga tushirish
@@ -65,7 +75,7 @@ Admin panel orqali:
 3. "Mahsulotlar" bo'limiga kiring va mahsulot qo'shing
 4. "Xizmatlar" bo'limiga kiring va xizmat qo'shing
 
-## 7. To'xtatish
+### 7. To'xtatish
 
 ```bash
 docker-compose down
@@ -75,6 +85,13 @@ Ma'lumotlar saqlanadi (volume orqali).
 
 ## Muammolar?
 
+### Development (Lokal)
+
 - **Bot ishlamayapti**: `.env` faylida `BOT_TOKEN` to'g'ri ekanligini tekshiring
 - **Database ulanmayapti**: `docker-compose logs db` orqali loglarni ko'ring
 - **Port band**: `docker-compose.yml` da portlarni o'zgartiring
+- **Bot conflict**: Faqat bitta bot instance ishlashi kerak. Agar production bot ishlayapti, lokal botni o'chiring
+
+### Production
+
+Production muammolari uchun: [DEPLOYMENT.md](DEPLOYMENT.md) yoki [TROUBLESHOOTING.md](TROUBLESHOOTING.md) fayllarini ko'ring.

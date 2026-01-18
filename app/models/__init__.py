@@ -1,3 +1,9 @@
-from app.models.product import Category, Product, Service, PriceType, ServiceContextType
+from app.models.product import (
+    Category, Product, Service, Order,
+    PriceType, ServiceContextType, OrderStatus
+)
 
-__all__ = ["Category", "Product", "Service", "PriceType", "ServiceContextType"]
+__all__ = [
+    "Category", "Product", "Service", "Order",
+    "PriceType", "ServiceContextType", "OrderStatus"
+]

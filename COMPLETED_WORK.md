@@ -103,7 +103,7 @@
   - Yopishtirish (Ofis)
   - Yopishtirish (Kvartira)
 
-## ✅ 7. Docker Sozlamalari
+## ✅ 7. Docker Sozlamalari (Development uchun)
 
 ### Port sozlamalari
 - ✅ PostgreSQL: `5434:5432` (tashqi:ichki)
@@ -115,10 +115,32 @@
 - ✅ `api` - FastAPI, reload rejimida
 - ✅ `bot` - Aiogram bot
 
+> **Eslatma:** Docker faqat lokal development uchun. Production deployment Dokploy serverida.
+
+## ✅ 7.1. Production Deployment (Dokploy)
+
+### Platforma
+- ✅ **Dokploy** - Production deployment platformasi
+- ✅ **Hostinger VPS** - Server hosting
+- ✅ **Ubuntu 24.04** - Operating system
+
+### Production Servislar
+- ✅ `marmarx-api` - FastAPI backend (Active)
+- ✅ `marmarx-bot` - Aiogram Telegram bot (Active)
+- ✅ `marmarx-db` - PostgreSQL database (Active)
+- ✅ `marmarx-frontend` - Nginx frontend (Active)
+
+### Environment Configuration
+- ✅ Environment variables Dokploy dashboard'da sozlangan
+- ✅ Database ichki Docker tarmog'i orqali ulanadi
+- ✅ Production loglari Dokploy dashboard'da ko'rinadi
+- ✅ Real-time monitoring va status tracking
+
 ## ✅ 8. Dokumentatsiya
 
-- ✅ `README.md` - To'liq loyiha dokumentatsiyasi
-- ✅ `QUICKSTART.md` - Tezkor boshlash qo'llanmasi
+- ✅ `README.md` - To'liq loyiha dokumentatsiyasi (Production/Development ajratilgan)
+- ✅ `QUICKSTART.md` - Tezkor boshlash qo'llanmasi (Development uchun)
+- ✅ `DEPLOYMENT.md` - **YANGI:** Dokploy production deployment qo'llanmasi
 - ✅ `TOKENS.md` - Tokenlar va sozlamalar ro'yxati
 - ✅ `ENV_SETUP.md` - .env faylini sozlash
 - ✅ `PORTS_INFO.md` - Port sozlamalari
@@ -148,19 +170,33 @@
 
 ## 🎯 Barcha Talablar Bajarildi
 
-✅ FastAPI, Aiogram 3, PostgreSQL (Async SQLAlchemy), SQLAdmin, Docker  
+✅ FastAPI, Aiogram 3, PostgreSQL (Async SQLAlchemy), SQLAdmin  
+✅ Docker (Development uchun)  
+✅ **Dokploy Production Deployment**  
 ✅ Barcha user-facing interface Uzbek tilida  
 ✅ Future-proofing - messages.py markazlashtirilgan  
 ✅ Production-ready kod  
-✅ Docker Compose sozlamalari  
-✅ Admin panel to'liq o'zbeklashtirildi  
+✅ Docker Compose sozlamalari (Development)  
+✅ Production deployment Dokploy serverida  
+✅ Admin panel to'liq o'zbeklashtirilgan  
 ✅ Seed data skripti  
-✅ To'liq dokumentatsiya  
+✅ To'liq dokumentatsiya (Production va Development ajratilgan)  
 
 ## 🚀 Tizim Holati
 
-- ✅ Database: Ishlamoqda
-- ✅ API: Ishlamoqda (http://localhost:8002)
-- ✅ Admin Panel: Ishlamoqda (http://localhost:8002/admin)
-- ✅ Bot: Ishlamoqda
-- ✅ Barcha template'lar: O'zbeklashtirilgan
+### Production (Dokploy Server)
+- ✅ **Database:** Ishlamoqda (marmarx-db servisida)
+- ✅ **API:** Ishlamoqda (marmarx-api servisida)
+- ✅ **Admin Panel:** Ishlamoqda (Dokploy API domain orqali)
+- ✅ **Bot:** Ishlamoqda (marmarx-bot servisida, @MarmarX_bot)
+- ✅ **Frontend:** Ishlamoqda (marmarx-frontend servisida)
+- ✅ **Barcha servislar:** Active holatda (Dokploy dashboard'da)
+
+### Development (Lokal - Docker)
+- ✅ **Database:** Docker Compose orqali ishga tushirish mumkin (localhost:5434)
+- ✅ **API:** Docker Compose orqali ishga tushirish mumkin (localhost:8002)
+- ✅ **Admin Panel:** Docker Compose orqali ishga tushirish mumkin (localhost:8002/admin)
+- ✅ **Bot:** Docker Compose orqali ishga tushirish mumkin (lekin production bot bilan conflict bo'ladi)
+- ✅ **Barcha template'lar:** O'zbeklashtirilgan
+
+> **⚠️ Muhim:** Production va development botlar bir vaqtda ishlamaydi (Telegram conflict). Production bot 24/7 Dokploy serverida ishlaydi.

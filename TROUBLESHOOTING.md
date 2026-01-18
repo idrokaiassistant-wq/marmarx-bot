@@ -1,4 +1,72 @@
-# Template Muammosini Hal Qilish
+# Muammolarni Hal Qilish - MarmarX Bot
+
+## 🔴 Bot Conflict Muammosi (TelegramConflictError)
+
+### Muammo belgilari:
+```
+TelegramConflictError: Conflict: terminated by other getUpdates request; 
+make sure that only one bot instance is running
+```
+
+### Muammoning sababi:
+Telegram bitta bot token bilan faqat bitta bot instance ishlashiga ruxsat beradi. Agar bot bir vaqtning o'zida ikki joyda ishlab turgan bo'lsa (masalan, serverda va mahalliy kompyuteringizda), bu conflict xatosi paydo bo'ladi.
+
+### ✅ Yechim:
+
+#### 1-qadam: Mahalliy kompyuterdagi botni tekshirish
+
+**Docker konteynerlarni tekshirish:**
+```bash
+docker ps -a | findstr marmarx
+```
+
+Agar konteynerlar ishlab turgan bo'lsa:
+```bash
+docker stop marmarx_bot
+```
+
+**Python jarayonlarini tekshirish:**
+```bash
+# Windows:
+tasklist | findstr python
+
+# Linux/Mac:
+ps aux | grep python
+```
+
+Agar Python jarayonlari ishlab turgan bo'lsa, uni to'xtating:
+- VS Code terminalida `Ctrl+C` bosing
+- Yoki jarayonni to'xtating
+
+#### 2-qadam: Docker Desktop tekshirish
+
+Agar Docker Desktop ishlamayotgan bo'lsa (xato: `failed to connect to docker API`), demak mahalliy bot allaqachon o'chgan. 
+
+**Tasdiqlash:**
+```bash
+docker ps
+```
+
+Agar xato chiqsa - Docker o'chiq, mahalliy bot ishlamayapti ✅
+
+#### 3-qadam: Serverdagi bot holatini tekshirish
+
+1. Dokploy (yoki boshqa server) ga kiring
+2. `marmarx-bot` servisining **Logs** bo'limini oching
+3. Endi conflict xatosi chiqmasligi kerak
+4. Agar hali ham chiqayotgan bo'lsa, servisni qayta ishga tushiring:
+   - **Stop** tugmasini bosing
+   - 5-10 soniya kutib turing
+   - **Start** tugmasini bosing
+
+### 📝 Xulosa:
+- **Production (Server)**: Serverdagi bot 24/7 ishlaydi
+- **Development (Local)**: Mahalliy testlar uchun serverdagi botni vaqtincha to'xtatib qo'ying
+- **Muammo**: Ikki botni bir vaqtning o'zida ishlatish mumkin emas
+
+---
+
+## 📄 Template Muammosini Hal Qilish
 
 ## Tekshirishlar
 
