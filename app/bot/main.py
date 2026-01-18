@@ -979,6 +979,112 @@ async def callback_admin_add_category(callback: CallbackQuery, state: FSMContext
     await callback.answer()
 
 
+@dp.callback_query(F.data == "admin_list_products")
+async def callback_admin_list_products(callback: CallbackQuery):
+    """Handle admin list products request."""
+    if not is_admin(callback.from_user.id):
+        await callback.answer(messages.ADMIN_ACCESS_DENIED)
+        return
+    
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(Product, Category)
+            .join(Category, Product.category_id == Category.id)
+            .order_by(Product.id.desc())
+            .limit(20)
+        )
+        products_data = result.all()
+    
+    if not products_data:
+        await callback.message.edit_text(
+            "Mahsulotlar topilmadi.",
+            reply_markup=get_admin_products_keyboard()
+        )
+        await callback.answer()
+        return
+    
+    response = "📦 **Mahsulotlar ro'yxati:**\n\n"
+    for product, category in products_data:
+        price_type_label = "Dona" if product.price_type == PriceType.DONA else "Kv.metr"
+        formatted_price = f"{product.price:,.0f}".replace(",", " ")
+        response += f"• **{product.name}**\n"
+        response += f"  ID: {product.id} | Kategoriya: {category.name}\n"
+        response += f"  Narx: {formatted_price} so'm ({price_type_label})\n\n"
+    
+    await callback.message.edit_text(
+        response,
+        reply_markup=get_admin_products_keyboard(),
+        parse_mode=ParseMode.MARKDOWN
+    )
+    await callback.answer()
+
+
+@dp.callback_query(F.data == "admin_orders")
+async def callback_admin_orders(callback: CallbackQuery):
+    """Handle admin orders request."""
+    if not is_admin(callback.from_user.id):
+        await callback.answer(messages.ADMIN_ACCESS_DENIED)
+        return
+    
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(Order, Product)
+            .join(Product, Order.product_id == Product.id)
+            .order_by(Order.created_at.desc())
+            .limit(20)
+        )
+        orders_data = result.all()
+    
+    if not orders_data:
+        await callback.message.edit_text(
+            "Buyurtmalar topilmadi.",
+            reply_markup=InlineKeyboardMarkup(
+                inline_keyboard=[[
+                    InlineKeyboardButton(
+                        text=messages.BTN_BACK,
+                        callback_data="admin_menu"
+                    )
+                ]]
+            )
+        )
+        await callback.answer()
+        return
+    
+    status_labels = {
+        OrderStatus.PENDING: "Qabul qilindi",
+        OrderStatus.PROCESSING: "Ko'rib chiqilmoqda",
+        OrderStatus.COMPLETED: "Bajarildi",
+        OrderStatus.CANCELLED: "Bekor qilindi"
+    }
+    
+    response = "📋 **Barcha buyurtmalar:**\n\n"
+    for order, product in orders_data:
+        response += f"**Buyurtma #{order.id}**\n"
+        response += f"Foydalanuvchi: {order.user_id}\n"
+        response += f"Mahsulot: {product.name}\n"
+        if order.quantity:
+            response += f"Miqdor: {order.quantity} dona\n"
+        if order.area:
+            response += f"Maydon: {order.area} kv.metr\n"
+        response += f"Narx: {order.total_price:,.0f} so'm\n"
+        response += f"Holat: {status_labels.get(order.status, order.status.value)}\n"
+        response += f"Sana: {order.created_at.strftime('%d.%m.%Y %H:%M')}\n\n"
+    
+    await callback.message.edit_text(
+        response,
+        reply_markup=InlineKeyboardMarkup(
+            inline_keyboard=[[
+                InlineKeyboardButton(
+                    text=messages.BTN_BACK,
+                    callback_data="admin_menu"
+                )
+            ]]
+        ),
+        parse_mode=ParseMode.MARKDOWN
+    )
+    await callback.answer()
+
+
 # Admin FSM handlers - Product creation
 @dp.message(StateFilter(AdminProductStates.waiting_for_category_id))
 async def handle_admin_product_category_id(message: Message, state: FSMContext):
