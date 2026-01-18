@@ -58,11 +58,12 @@ class Messages:
     SERVICE_DOM = "dom"
     
     # Catalog messages
-    CATALOG_TITLE = "📦 Mahsulotlar katalogi"
+    CATALOG_TITLE = "📦 **Mahsulotlar katalogi**"
     SELECT_CATEGORY = "Kategoriyani tanlang:"
-    NO_CATEGORIES = "Kategoriyalar topilmadi."
-    PRODUCTS_IN_CATEGORY = "📂 {category_name} kategoriyasi:"
-    NO_PRODUCTS = "Bu kategoriyada mahsulotlar topilmadi."
+    NO_CATEGORIES = "❌ Kategoriyalar topilmadi."
+    PRODUCTS_IN_CATEGORY = "📂 **{category_name}** kategoriyasi:\n\n" \
+                           "Mahsulotlardan birini tanlang:"
+    NO_PRODUCTS = "❌ Bu kategoriyada mahsulotlar topilmadi."
     PRODUCT_DETAILS = "📦 **{name}**\n\n" \
                       "{description}\n\n" \
                       "💰 **Narx:** {price} so'm ({price_type})\n" \
@@ -92,9 +93,11 @@ class Messages:
     NO_ORDERS = "Sizda hozircha buyurtmalar yo'q."
     
     # Search messages
-    SEARCH_PROMPT = "Qidirish uchun mahsulot nomini kiriting:"
+    SEARCH_PROMPT = "🔍 **Qidirish**\n\n" \
+                    "Mahsulot nomini yoki tavsifini kiriting:"
     SEARCH_RESULTS = "🔍 **Qidiruv natijalari:**\n\n"
-    NO_SEARCH_RESULTS = "Hech qanday mahsulot topilmadi."
+    NO_SEARCH_RESULTS = "❌ Hech qanday mahsulot topilmadi.\n\n" \
+                        "Iltimos, boshqa so'zlar bilan qayta urinib ko'ring."
     
     # Keyboard labels
     BTN_CATALOG = "📦 Katalog"
@@ -114,9 +117,12 @@ class Messages:
     ADMIN_ACCESS_DENIED = "❌ Sizda admin huquqi yo'q."
     ADMIN_MENU = "🔧 **Admin Panel**\n\n" \
                  "Kerakli bo'limni tanlang:"
-    ADMIN_PRODUCTS = "📦 Mahsulotlar boshqaruvi"
-    ADMIN_CATEGORIES = "📂 Kategoriyalar boshqaruvi"
-    ADMIN_ORDERS = "📋 Buyurtmalar boshqaruvi"
+    ADMIN_PRODUCTS = "📦 **Mahsulotlar boshqaruvi**\n\n" \
+                     "Mahsulotlar bilan ishlash funksiyalari:"
+    ADMIN_CATEGORIES = "📂 **Kategoriyalar boshqaruvi**\n\n" \
+                       "Kategoriyalar bilan ishlash funksiyalari:"
+    ADMIN_ORDERS = "📋 **Buyurtmalar boshqaruvi**\n\n" \
+                   "Buyurtmalar bilan ishlash funksiyalari:"
     ADMIN_SERVICES = "🔧 Xizmatlar boshqaruvi"
     
     # Admin - Product management
@@ -152,9 +158,9 @@ class Messages:
     BTN_ADMIN_CATEGORIES = "📂 Kategoriyalar"
     BTN_ADMIN_ORDERS = "📋 Buyurtmalar"
     BTN_ADMIN_SERVICES = "🔧 Xizmatlar"
-    BTN_ADMIN_ADD_PRODUCT = "+ Mahsulot qo'shish"
+    BTN_ADMIN_ADD_PRODUCT = "➕ Mahsulot qo'shish"
     BTN_ADMIN_LIST_PRODUCTS = "📋 Mahsulotlar ro'yxati"
-    BTN_ADMIN_ADD_CATEGORY = "+ Kategoriya qo'shish"
+    BTN_ADMIN_ADD_CATEGORY = "➕ Kategoriya qo'shish"
 
 
 # Create a singleton instance

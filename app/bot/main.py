@@ -80,8 +80,7 @@ def is_admin(user_id: int) -> bool:
 def get_main_keyboard(user_id: Optional[int] = None) -> ReplyKeyboardMarkup:
     """Create main menu keyboard."""
     buttons = [
-        [KeyboardButton(text=messages.BTN_CATALOG)],
-        [KeyboardButton(text=messages.BTN_SEARCH)],
+        [KeyboardButton(text=messages.BTN_CATALOG), KeyboardButton(text=messages.BTN_SEARCH)],
         [KeyboardButton(text=messages.BTN_MY_ORDERS)],
     ]
     
@@ -137,9 +136,7 @@ def get_admin_products_keyboard() -> InlineKeyboardMarkup:
                 InlineKeyboardButton(
                     text=messages.BTN_ADMIN_ADD_PRODUCT,
                     callback_data="admin_add_product"
-                )
-            ],
-            [
+                ),
                 InlineKeyboardButton(
                     text=messages.BTN_ADMIN_LIST_PRODUCTS,
                     callback_data="admin_list_products"
@@ -253,9 +250,7 @@ def get_product_actions_keyboard(product_id: int) -> InlineKeyboardMarkup:
                 InlineKeyboardButton(
                     text=messages.BTN_CALCULATE_PRICE,
                     callback_data=f"calc_price_{product_id}"
-                )
-            ],
-            [
+                ),
                 InlineKeyboardButton(
                     text=messages.BTN_ORDER,
                     callback_data=f"order_{product_id}"
