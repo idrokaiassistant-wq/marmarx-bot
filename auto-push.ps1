@@ -11,7 +11,7 @@ git add .
 
 # Commit xabarini so'rash
 Write-Host "`nCommit xabarini kiriting (faqat matn, git komandalar emas):" -ForegroundColor Cyan
-$commitMessage = Read-Host ""
+$commitMessage = Read-Host "Commit xabari"
 
 if ([string]::IsNullOrWhiteSpace($commitMessage)) {
     $commitMessage = "Update: " + (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
